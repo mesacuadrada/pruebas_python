@@ -37,7 +37,7 @@ def index():
     return render_template("index.html", params=var_data)
 
 
-@app.route('/contacto/<nombre>/<int:edad>')  # < > indica q se espera parámetro nombre
+@app.route('/contacto/<nombre>/<int:edad>')  # <nombre> indica q se espera parámetro nombre
 def contacto(nombre, edad):
     var_data = {
         'titulo': 'Contacto',

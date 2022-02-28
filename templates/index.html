@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %} {{ params.titulo }} {% endblock %}
+
+{% block body %}
+
+<h1>{{ params.bienvenida }}</h1>
+{% if params.numero_cursos > 0 %}
+<ul>
+    {% for c in params.cursos %}
+    <li>{{ c }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<h2>Sin cursos</h2>
+{% endif %}
+
+{% endblock %}

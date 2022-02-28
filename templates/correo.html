@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %} {{ params.titulo }} {% endblock %}
+
+{% block body %}
+
+<h2>Hola</h2>
+<form action="{{ url_for('query_string') }}">
+    <input type="text" name="correo" placeholder="correo electrónico"><br>
+    <input type="text" name="nombre" placeholder="nombre"><br>
+    <input type="text" name="edad" placeholder="edad">
+    <input type="submit" value="Enviar">
+</form>
+
+
+{% endblock %}
