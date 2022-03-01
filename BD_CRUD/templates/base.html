@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <style type="text/css">
+        * {
+            font-family: arial;
+        }
+        table {
+            display: inline
+        }
+        input{
+            border-radius: 6px;
+            vertical-align:bottom;
+            border: 3px solid;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 10px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <center>
+    <h1><a href="{{ url_for('index') }}">BD CRUD</a></h1>
+    <hr>
+    <h2>{% block titular %}{% endblock %}</h2>
+    <div id="tablas" style="width:50%">
+    <hr>
+
+    {% block body %}
+    {% endblock %}
+
+    </div>
+    </center>
+
+
+</body>
+</html>

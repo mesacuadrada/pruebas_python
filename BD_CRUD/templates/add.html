@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %} {{ params.titulo }} {% endblock %}
+
+{% block titular %} {{ params.titulo }} {% endblock %}
+
+{% block body %}
+
+<center>
+    <div><input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla"><img src="{{ url_for('static', filename='images/field_remove.png') }}" width="40"></div>
+    <hr>
+    <div><input type="text" name="campo1" id="campo1" placeholder="Campo 1"><img src="{{ url_for('static', filename='images/field_add.png') }}" width="40"></div>
+</center>
+
+{% endblock %}
