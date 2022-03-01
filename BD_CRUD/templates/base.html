@@ -3,7 +3,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery360.js') }}"></script>
     <style type="text/css">
         * {
             font-family: arial;
@@ -11,7 +11,7 @@
         table {
             display: inline
         }
-        input{
+        input, select {
             border-radius: 6px;
             vertical-align:bottom;
             border: 3px solid;
@@ -21,6 +21,9 @@
             margin: 5px;
         }
     </style>
+
+    {% block head%}{% endblock %}
+
 </head>
 <body>
 
@@ -28,7 +31,7 @@
     <h1><a href="{{ url_for('index') }}">BD CRUD</a></h1>
     <hr>
     <h2>{% block titular %}{% endblock %}</h2>
-    <div id="tablas" style="width:50%">
+    <div id="tablas" style="width: auto">
     <hr>
 
     {% block body %}

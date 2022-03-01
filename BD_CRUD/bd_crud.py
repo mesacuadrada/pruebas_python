@@ -37,11 +37,13 @@ def index():
 
         cur = connection.cursor()
         cur.execute("SELECT table_name FROM user_tables ORDER BY table_name")
+  
         rows = cur.fetchall()
-        print("elementos: ", len(rows))
+        lista_temporal = []
 
-        #for filas in rows:
-        print(rows)
+        for filas in rows:
+            for celdas in filas:
+                lista_temporal.append(celdas)
 
     except Exception as e:
         print(e)
@@ -51,7 +53,7 @@ def index():
 
     var_data = {
         "titulo": "Gestión BD",
-        "datos_bd": rows
+        "datos_bd": lista_temporal
     }
 
     return render_template("index.html", params=var_data)

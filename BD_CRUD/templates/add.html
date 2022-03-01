@@ -4,12 +4,78 @@
 
 {% block titular %} {{ params.titulo }} {% endblock %}
 
+{% block head %}
+
+<script>
+
+    var contador = 0;
+
+
+    $(document).ready(function(){ // espera que se carge la página para ejecutarse
+        
+        $("#btn_add").bind("click", add_campo);
+        $("#btn_aceptar").bind("click", show_data);
+        $("#btn_add").bind("mouseover", function(){
+            $(this).css("cursor", "pointer");
+        });
+        $("#add_controles img").bind("click", remove_campo);
+        
+    });
+
+    function remove_campo(e){
+        var elemento = $(e.target).parent();
+        elemento.css("background-color", "red");
+        elemento.fadeOut(250, function(){elemento.html("")})
+    }
+
+    function show_data(){
+        $("#txt_resultados").html($("form").serializeArray());
+        console.log($("form").serializeArray());
+    }
+
+    function add_campo(){
+        contador++;
+        var campo = "campo_" + contador;
+        var codigo = "<div id='div_"+contador+"'>"+
+        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo'>" +
+        "<select name='tipo_dato_"+contador+"'>" +
+        "<option value='varchar'>VarChar" +
+        "<option value='number'>Number" +
+        "<option value='date'>Date" +
+        "</select>"+
+        "<input type='text' id='"+campo+"_len' name='"+campo+"_len' size='1' value='25'>"+
+        "<img id="+contador+" src=\"{{ url_for('static', filename='images/field_remove.png') }}\" width='40'>" +
+        "</div>";
+
+        $("#add_controles").append(codigo);
+        $("#add_controles img").bind("click", remove_campo);
+
+    }
+            
+
+
+</script>
+
+{% endblock %}
+
 {% block body %}
 
 <center>
-    <div><input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla"><img src="{{ url_for('static', filename='images/field_remove.png') }}" width="40"></div>
+    <form>
+    <div id="add_controles">
+        <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla">
+    </div>
     <hr>
-    <div><input type="text" name="campo1" id="campo1" placeholder="Campo 1"><img src="{{ url_for('static', filename='images/field_add.png') }}" width="40"></div>
+    <div>
+        <script>add_campo();</script>
+        <img id="btn_add" src="{{ url_for('static', filename='images/field_add.png') }}" width='40'>
+    </div>
+    <br>
+    <input type="button" id="btn_aceptar" value=" ACEPTAR ">
+    </form>
+
+    <div id="txt_resultados"></div>
+
 </center>
 
 {% endblock %}
