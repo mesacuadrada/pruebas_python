@@ -14,7 +14,7 @@
     $(document).ready(function(){ // espera que se carge la página para ejecutarse
         
         $("#btn_add").bind("click", add_campo);
-        $("#btn_aceptar").bind("click", show_data);
+        $("#btn_aceptar").bind("click", send_data);
         $("#btn_add").bind("mouseover", function(){
             $(this).css("cursor", "pointer");
         });
@@ -24,14 +24,16 @@
 
     function remove_campo(e){
         var elemento = $(e.target).parent();
-        elemento.css("background-color", "red");
+        elemento.css("background-color", "#c00");
         elemento.fadeOut(250, function(){elemento.html("")})
     }
 
-    function show_data(){
+    function send_data(){
         $("#txt_resultados").html($("form").serializeArray());
-        console.log($("form").serializeArray());
-    }
+            array_datos =  $("form").serializeArray();
+            console.log(array_datos);
+            window.location.href = "/add_table?p="+array_datos;
+        }
 
     function add_campo(){
         contador++;
@@ -51,8 +53,6 @@
         $("#add_controles img").bind("click", remove_campo);
 
     }
-            
-
 
 </script>
 
@@ -61,7 +61,7 @@
 {% block body %}
 
 <center>
-    <form>
+    <form action="/add" method="post">
     <div id="add_controles">
         <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla">
     </div>
@@ -71,7 +71,7 @@
         <img id="btn_add" src="{{ url_for('static', filename='images/field_add.png') }}" width='40'>
     </div>
     <br>
-    <input type="button" id="btn_aceptar" value=" ACEPTAR ">
+    <input type="submit" id="btn_aceptar" value=" ACEPTAR ">
     </form>
 
     <div id="txt_resultados"></div>

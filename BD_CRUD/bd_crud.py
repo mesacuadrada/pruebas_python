@@ -12,12 +12,23 @@ app.config['MYSQL_DB'] = "proyecto_final"
 
 conn = MySQL(app)
 
-@app.route('/add')
+@app.route('/add', methods=["GET", "POST"])
 def add():
+
     var_data = {
         "titulo": "Añadir tabla"
     }
-    return render_template("add.html", params=var_data)
+
+    if request.method == "POST":
+        # request.args['nombre_tabla'] para acceder al parámetro a través del GET
+        # request.form['nombre_tabla'] para acceder al parámetro a través del POST
+        nombre = request.form['nombre_tabla']
+        print("El nombre de la tabla es ", nombre)
+        return render_template("add.html", params=var_data)
+    else:
+        return render_template("add.html", params=var_data)
+
+
 
 
 @app.route('/')
@@ -33,7 +44,7 @@ def index():
             encoding="UTF-8"
         )
 
-        print(connection.version)
+        print("*************** ", connection.version)
 
         cur = connection.cursor()
         cur.execute("SELECT table_name FROM user_tables ORDER BY table_name")
