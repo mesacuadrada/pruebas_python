@@ -5,5 +5,27 @@
 {% block titular %} {{ params.titulo }} {% endblock %}
 
 {% block body %}
-<h1>Contenido de tabla</h1>
+<!-- <h3>{{ columnas  }}<br>{{ registros }}</h3> -->
+
+<table>
+    <tr>
+    {% for filas in columnas: %}
+
+        {% for celdas in filas %}
+            <th>{{ celdas }}</th>
+        {% endfor %}
+
+    {% endfor %}
+    </tr>
+
+    {% for fila in registros: %}
+    <tr>
+        {% for celda in fila %}
+           <td><input type="text" size="9" value="{{ celda }}"> </td>
+        {% endfor %}
+        <br>
+    </tr>
+    {% endfor %}
+</table>
+
 {% endblock %}

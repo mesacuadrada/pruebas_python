@@ -20,9 +20,12 @@ def show(tabla):
         "titulo": "Contenido de " + tabla
     }
 
-    print(consulta_bd("SELECT * from {}".format(tabla)))
-
-    return render_template("show.html", params=var_data)
+    var_registros = consulta_bd("SELECT * FROM {}".format(tabla))
+    print(var_registros)
+    # recuperamos el nombre de las columnas para mostrarlo
+    var_columnas = consulta_bd("SELECT column_name FROM all_tab_columns WHERE table_name ='" + tabla  + "'")
+    
+    return render_template("show.html", params=var_data, registros=var_registros, columnas=var_columnas)
 
 
 
@@ -48,14 +51,18 @@ def add():
         sql = "create table {} (".format(tabla)
         es_date = False
 
-        #print(request.form)
-
+        '''
+        # convierte una lista a diccionario
+        lista = dict(request.form)
+        print(lista.items)
+        '''
         for clave in request.form:
             
             # saltamos el primer valor que es el nombre de la tabla
             if "nombre_tabla" in clave:
                 continue # volvemos el inicio del bucle para tratar la siguiente clave
 
+            # accedemos al valor de una clave del formulario
             valor = request.form.get(clave)
 
             # comprobamos que el tipo de dato sea Date para no meter longitud en él
@@ -126,10 +133,13 @@ def consulta_bd(sql):
             cur.execute(sql)
             connection.commit()
     
-            rows = cur.fetchall()
+            return cur.fetchall()
+            #rows = cur.fetchall()
             lista_temporal = []
 
-            print(sql cur.len)
+            #print(cur.rowcount() )
+            #cur.first()
+            # hay q devolver el cursor al inicio o contar de otra manera las ocurrencias
 
             for filas in rows:
                 for celdas in filas:
@@ -137,8 +147,8 @@ def consulta_bd(sql):
             
             return lista_temporal
 
-        except Exception as e:
-            print(e)
+        except Exception as ex:
+            print(ex)
         finally:
             connection.close()
             print("Conexión cerrada")
