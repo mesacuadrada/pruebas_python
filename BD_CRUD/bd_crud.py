@@ -13,6 +13,20 @@ app.config['MYSQL_DB'] = "proyecto_final"
 
 conn = MySQL(app)
 
+@app.route('/show/<tabla>')
+def show(tabla):
+
+    var_data = {
+        "titulo": "Contenido de " + tabla
+    }
+
+    print(consulta_bd("SELECT * from {}".format(tabla)))
+
+    return render_template("show.html", params=var_data)
+
+
+
+
 @app.route('/add', methods=["GET", "POST"])
 def add():
 
@@ -90,6 +104,7 @@ def index():
 
     return render_template("index.html", params=var_data)
 
+
 # hace una consulta a la BD
 def consulta_bd(sql):
 
@@ -104,14 +119,17 @@ def consulta_bd(sql):
             #print("*************** ", connection.version)
 
             cur = connection.cursor()
-
+            '''
             query = "alter session set \"_use_nosegment_indexes\" = true"
             cur.execute(query)
+            '''
             cur.execute(sql)
             connection.commit()
     
             rows = cur.fetchall()
             lista_temporal = []
+
+            print(sql cur.len)
 
             for filas in rows:
                 for celdas in filas:

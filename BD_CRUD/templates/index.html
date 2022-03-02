@@ -9,7 +9,7 @@
     {% for celdas in params.datos_bd: %}
     <table border="0" cellpadding="5" cellspacing="0">
     <tr><td>
-        <a href="{{ url_for('add')}}"><img src="{{ url_for('static', filename='images/bd.png') }}" width="100"></a>
+        <a href="{{ url_for('show', tabla=celdas)}}"><img src="{{ url_for('static', filename='images/bd.png') }}" width="100"></a>
     </td></tr>
     <tr><td align="center">
         <p>{{ celdas }}
