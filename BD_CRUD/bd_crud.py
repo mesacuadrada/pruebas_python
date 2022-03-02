@@ -40,11 +40,11 @@ def add():
             
             # saltamos el primer valor que es el nombre de la tabla
             if "nombre_tabla" in clave:
-                continue
+                continue # volvemos el inicio del bucle para tratar la siguiente clave
 
             valor = request.form.get(clave)
 
-            # comprobamos que el tipo de dato sea Date para no meter longitud en el
+            # comprobamos que el tipo de dato sea Date para no meter longitud en él
             if "date" in valor:
                 es_date = True
 
@@ -52,6 +52,7 @@ def add():
             if "_len" in clave:
                 
                 if es_date == False:
+                    sql = sql.rstrip(" ") # quitamos el espacio dejado por la ultima vuelta
                     valor = "({}),".format(valor)
                 else:
                     # si es fecha no se imprime el valor actual
@@ -64,49 +65,23 @@ def add():
 
         # eliminamos ", " dejado por la última pasada del bucle
         sql = sql.rstrip(", ")
-        sql += ");"
-
-        print(sql)
+        sql += ")" # las sentencias SQL NO deben acabar en ; lanzan error: ORA-00922: falta la opción o no es válida
         
-        return render_template("add.html", params=var_data)
+        print(consulta_bd(sql))
+        return redirect('/inicio')
 
     else:
-
+        # el método de llamada es GET
         return render_template("add.html", params=var_data)
-
-
 
 
 @app.route('/')
 @app.route('/home')
 @app.route('/inicio')
+# muestra por defecto la lista de tablas en la BD
 def index():
-
-    try:
-        connection = cx_Oracle.connect(
-            user="jsarmenteros",
-            password="123456",
-            dsn="localhost:1521/orcl",
-            encoding="UTF-8"
-        )
-
-        print("*************** ", connection.version)
-
-        cur = connection.cursor()
-        cur.execute("SELECT table_name FROM user_tables ORDER BY table_name")
-  
-        rows = cur.fetchall()
-        lista_temporal = []
-
-        for filas in rows:
-            for celdas in filas:
-                lista_temporal.append(celdas)
-
-    except Exception as e:
-        print(e)
-    finally:
-        connection.close()
-        print("Conexión cerrada")
+    sql  = "SELECT table_name FROM user_tables ORDER BY table_name"
+    lista_temporal = consulta_bd(sql)
 
     var_data = {
         "titulo": "Gestión BD",
@@ -117,10 +92,40 @@ def index():
 
 # hace una consulta a la BD
 def consulta_bd(sql):
-    return  "datos devueltos"
 
+        try:
+            connection = cx_Oracle.connect(
+                user="jsarmenteros",
+                password="123456",
+                dsn="localhost:1521/orcl",
+                encoding="UTF-8"
+            )
+
+            #print("*************** ", connection.version)
+
+            cur = connection.cursor()
+
+            query = "alter session set \"_use_nosegment_indexes\" = true"
+            cur.execute(query)
+            cur.execute(sql)
+            connection.commit()
     
+            rows = cur.fetchall()
+            lista_temporal = []
 
+            for filas in rows:
+                for celdas in filas:
+                    lista_temporal.append(celdas)
+            
+            return lista_temporal
+
+        except Exception as e:
+            print(e)
+        finally:
+            connection.close()
+            print("Conexión cerrada")
+
+        
 if __name__ == '__main__':
     #app.register_error_handler(404, pagina_no_encontrada)
     app.run(debug=True, port=5000)

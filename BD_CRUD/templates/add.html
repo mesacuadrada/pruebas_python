@@ -33,7 +33,7 @@
         contador++;
         var campo = "campo_" + contador;
         var codigo = "<div id='div_"+contador+"'>"+
-        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo' value='Campo "+contador+"'>" +
+        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo'>" +
         "<select name='tipo_dato_"+contador+"'>" +
         "<option value='varchar'>VarChar" +
         "<option value='number'>Number" +
@@ -57,7 +57,7 @@
 <center>
     <form action="/add" method="post">
     <div id="add_controles">
-        <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla" value="Trafico">
+        <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla">
     </div>
     <img src="../static/images/separador2.png">
     <div>
