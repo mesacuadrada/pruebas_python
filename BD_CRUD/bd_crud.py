@@ -22,8 +22,10 @@ def add():
     if request.method == "POST":
         # request.args['nombre_tabla'] para acceder al parámetro a través del GET
         # request.form['nombre_tabla'] para acceder al parámetro a través del POST
-        nombre = request.form['nombre_tabla']
-        print("El nombre de la tabla es ", nombre)
+        
+        for linea in request.form:
+            print(linea)
+        
         return render_template("add.html", params=var_data)
     else:
         return render_template("add.html", params=var_data)
