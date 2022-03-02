@@ -5,18 +5,27 @@
     <meta name="viewport" content="initial-scale=1">
     <script src="{{ url_for('static', filename='js/jquery360.js') }}"></script>
     <style type="text/css">
-        * {
+        h1, h2, a, p {
             font-family: arial;
+            color: white;
+            font-weight: bold;
+        }
+        a{
+            text-decoration-line: underline;
+            text-decoration-color: goldenrod;
+
         }
         table {
             display: inline
         }
         input, select {
             border-radius: 6px;
-            vertical-align:bottom;
-            border: 3px solid;
-            font-size: 14px;
+            border: 3px solid white;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
             font-weight: bold;
+            vertical-align:bottom;
+            font-size: 18px;
             padding: 10px;
             margin: 5px;
         }
@@ -25,14 +34,15 @@
     {% block head%}{% endblock %}
 
 </head>
-<body>
+<body bgcolor="#777" background="../static/images/bg1.png">
 
     <center>
     <h1><a href="{{ url_for('index') }}">BD CRUD</a></h1>
-    <hr>
+    <img src="../static/images/separador2.png"><br>
     <h2>{% block titular %}{% endblock %}</h2>
     <div id="tablas" style="width: auto">
-    <hr>
+    <img src="../static/images/separador2.png"><br>
+    
 
     {% block body %}
     {% endblock %}

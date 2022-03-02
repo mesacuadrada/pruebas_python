@@ -24,22 +24,16 @@
 
     function remove_campo(e){
         var elemento = $(e.target).parent();
-        elemento.css("background-color", "#c00");
+        elemento.css("background-color", "goldenrod");
         elemento.fadeOut(250, function(){elemento.html("")})
     }
 
-    function send_data(){
-        $("#txt_resultados").html($("form").serializeArray());
-            array_datos =  $("form").serializeArray();
-            console.log(array_datos);
-            window.location.href = "/add_table?p="+array_datos;
-        }
 
     function add_campo(){
         contador++;
         var campo = "campo_" + contador;
         var codigo = "<div id='div_"+contador+"'>"+
-        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo'>" +
+        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo' value='Campo "+contador+"'>" +
         "<select name='tipo_dato_"+contador+"'>" +
         "<option value='varchar'>VarChar" +
         "<option value='number'>Number" +
@@ -63,9 +57,9 @@
 <center>
     <form action="/add" method="post">
     <div id="add_controles">
-        <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla">
+        <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla" value="Trafico">
     </div>
-    <hr>
+    <img src="../static/images/separador2.png">
     <div>
         <script>add_campo();</script>
         <img id="btn_add" src="{{ url_for('static', filename='images/field_add.png') }}" width='40'>
