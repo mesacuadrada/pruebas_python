@@ -10,8 +10,31 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'jsarmenteros'
 app.config['MYSQL_PASSWORD'] = "Jm)GCELdIwA0hBlI"
 app.config['MYSQL_DB'] = "proyecto_final"
-
 conn = MySQL(app)
+
+
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    var_data = {
+        "titulo": "Login"
+    }
+
+    if request.method == "POST":
+
+        usuario = request.form.get('user')
+        password = request.form.get('pass')
+
+        # si hay nombre en la tabla empezamos a meter datos en la BD
+        sql = "SELECT password FROM usuarios WHERE usuario = 'jsarmenteros'"
+        print(sql)
+        var_registros = consulta_bd(sql)
+
+        for fila in var_registros:
+            for celda in fila:
+                print(celda)
+
+
+    return render_template('login.html', params=var_data)
 
 @app.route('/show/<tabla>')
 def show(tabla):
@@ -24,10 +47,8 @@ def show(tabla):
     print(var_registros)
     # recuperamos el nombre de las columnas para mostrarlo
     var_columnas = consulta_bd("SELECT column_name FROM all_tab_columns WHERE table_name ='" + tabla  + "'")
-    
+
     return render_template("show.html", params=var_data, registros=var_registros, columnas=var_columnas)
-
-
 
 
 @app.route('/add', methods=["GET", "POST"])
@@ -46,7 +67,7 @@ def add():
         # comprobamos que haya nombre en la tabla
         if tabla == "":
             return render_template("add.html", params=var_data)
-        
+
         # si hay nombre en la tabla empezamos a meter datos en la BD
         sql = "create table {} (".format(tabla)
         es_date = False
@@ -57,7 +78,7 @@ def add():
         print(lista.items)
         '''
         for clave in request.form:
-            
+
             # saltamos el primer valor que es el nombre de la tabla
             if "nombre_tabla" in clave:
                 continue # volvemos el inicio del bucle para tratar la siguiente clave
@@ -71,7 +92,7 @@ def add():
 
             # comprobamos que estemos en el valor longitud del tipo de dato y no sea un tipo Date
             if "_len" in clave:
-                
+
                 if es_date == False:
                     sql = sql.rstrip(" ") # quitamos el espacio dejado por la ultima vuelta
                     valor = "({}),".format(valor)
@@ -82,12 +103,12 @@ def add():
                     es_date = False
                     continue
 
-            sql += "{} ".format(valor)        
+            sql += "{} ".format(valor)
 
         # eliminamos ", " dejado por la última pasada del bucle
         sql = sql.rstrip(", ")
         sql += ")" # las sentencias SQL NO deben acabar en ; lanzan error: ORA-00922: falta la opción o no es válida
-        
+
         print(consulta_bd(sql))
         return redirect('/inicio')
 
@@ -126,26 +147,12 @@ def consulta_bd(sql):
             #print("*************** ", connection.version)
 
             cur = connection.cursor()
-            '''
             query = "alter session set \"_use_nosegment_indexes\" = true"
             cur.execute(query)
-            '''
             cur.execute(sql)
             connection.commit()
-    
+
             return cur.fetchall()
-            #rows = cur.fetchall()
-            lista_temporal = []
-
-            #print(cur.rowcount() )
-            #cur.first()
-            # hay q devolver el cursor al inicio o contar de otra manera las ocurrencias
-
-            for filas in rows:
-                for celdas in filas:
-                    lista_temporal.append(celdas)
-            
-            return lista_temporal
 
         except Exception as ex:
             print(ex)
@@ -153,7 +160,7 @@ def consulta_bd(sql):
             connection.close()
             print("Conexión cerrada")
 
-        
+
 if __name__ == '__main__':
     #app.register_error_handler(404, pagina_no_encontrada)
     app.run(debug=True, port=5000)
