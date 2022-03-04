@@ -14,8 +14,7 @@ app.config['MYSQL_DB'] = "proyecto_final"
 app.config['SECRET_KEY'] = 'GFeqrwt·$%dsafg$&%/"·'
 
 conn = MySQL(app)
-
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/login', methods=["GET", "POST"])
 def login():
     var_data = {
@@ -51,23 +50,34 @@ def login():
     else: # si entramos por GET
         return render_template('login.html', params=var_data)
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/show/<tabla>')
+@app.route('/show/<tabla>/<campos>')
+def show(tabla, campos):
+
+    if inicio_sesion() == False:
+        return redirect('/login');
+
 def show(tabla):
 
+    if inicio_sesion() == False:
+        return redirect('/login');
+
     var_data = {
-        "titulo": "Contenido de " + tabla
+        "titulo": tabla
     }
 
     var_registros = consulta_bd("SELECT * FROM {}".format(tabla))
-    print(var_registros)
     # recuperamos el nombre de las columnas para mostrarlo
     var_columnas = consulta_bd("SELECT column_name FROM all_tab_columns WHERE table_name ='" + tabla  + "'")
 
     return render_template("show.html", params=var_data, registros=var_registros, columnas=var_columnas)
-
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/add', methods=["GET", "POST"])
 def add():
+
+    if inicio_sesion() == False:
+        return redirect('/login');
 
     var_data = {
         "titulo": "Añadir tabla"
@@ -131,18 +141,17 @@ def add():
     else:
         # el método de llamada es GET
         return render_template("add.html", params=var_data)
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/logout')
 def logout():
     session.clear();
     return redirect('/login')
-
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/remove')
 def remove():
 
-    if 'usuario' not in session:
-        return "<h1><a href='/login'>Inicie sesión</a> primero.</h1>"
+    if inicio_sesion() == False:
+        return redirect('/login');
 
     sql  = "SELECT table_name FROM user_tables ORDER BY table_name"
     resultados = consulta_bd(sql)
@@ -153,13 +162,19 @@ def remove():
     }
 
     return render_template("remove.html", params=var_data)
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+@app.route('/insert')
+def insert():
 
-
+    dict = request.form
+    for key in dict:
+        print('form key '+dict[key])
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/remove_table/<tabla>')
 def remove_table(tabla):
 
-    if 'usuario' not in session:
-        return "<h1><a href='/login'>Inicie sesión</a> primero.</h1>"
+    if inicio_sesion() == False:
+        return redirect('/login');
 
     sql  = "drop table {}".format(tabla)
     print("************", sql)
@@ -171,16 +186,15 @@ def remove_table(tabla):
     }
 
     return redirect('/remove')
-
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/')
 @app.route('/home')
 @app.route('/inicio')
 # muestra por defecto la lista de tablas en la BD
 def index():
 
-    if 'usuario' not in session:
-        return "<h1><a href='/login'>Inicie sesión</a> primero.</h1>"
+    if inicio_sesion() == False:
+        return redirect('/login');
 
     sql  = "SELECT table_name FROM user_tables ORDER BY table_name"
     lista_temporal = consulta_bd(sql)
@@ -191,8 +205,15 @@ def index():
     }
 
     return render_template("index.html", params=var_data)
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+def inicio_sesion():
 
-
+    if 'usuario' in session:
+        return True
+    else:
+        flash ("Inicie sesión para continuar")
+        return False
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # hace una consulta a la BD
 def consulta_bd(sql):
 
@@ -219,8 +240,7 @@ def consulta_bd(sql):
         finally:
             connection.close()
             print("Conexión cerrada")
-
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 if __name__ == '__main__':
     #app.register_error_handler(404, pagina_no_encontrada)
     app.run(debug=True, port=5000)

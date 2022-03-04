@@ -4,8 +4,28 @@
 
 {% block titular %} {{ params.titulo }} {% endblock %}
 
+{% block head %}
+<script>
+    $(document).ready(function(){ // espera que se carge la página para ejecutarse
+        /*
+        var path = "../static/images/bg" + Math.floor((Math.random() * 2) + 1) + ".png";
+        document.getElementsByTagName("body")[0].style = "background-image: url('" + path +"')";
+        */
+        $("#contenido a").bind("click", function(e){
+
+            if (confirm("¿Eliminar tabla?") != true) {
+                return false;
+            }
+
+         });
+
+    });
+</script>
+{% endblock %}
+
 {% block body %}
 
+    <div id="contenido">
     {% for filas in params.datos_bd: %}
         {% for celdas in filas: %}
             <table class="inline">
@@ -18,5 +38,6 @@
             </table>
         {% endfor %}
     {% endfor %}
+    </div>
 
     {% endblock %}
