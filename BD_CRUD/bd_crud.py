@@ -1,5 +1,6 @@
 import re
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, flash, render_template, request, redirect, url_for, jsonify, session
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask_mysqldb import MySQL
 import cx_Oracle
 
@@ -10,6 +11,8 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'jsarmenteros'
 app.config['MYSQL_PASSWORD'] = "Jm)GCELdIwA0hBlI"
 app.config['MYSQL_DB'] = "proyecto_final"
+app.config['SECRET_KEY'] = 'GFeqrwt·$%dsafg$&%/"·'
+
 conn = MySQL(app)
 
 
@@ -26,15 +29,27 @@ def login():
 
         # si hay nombre en la tabla empezamos a meter datos en la BD
         sql = "SELECT password FROM usuarios WHERE usuario = 'jsarmenteros'"
-        print(sql)
         var_registros = consulta_bd(sql)
+        bd_pass = ""
 
+        # recorremos la fila y sacamos el valor
         for fila in var_registros:
             for celda in fila:
-                print(celda)
+                bd_pass = celda
 
+        # comparamos el hash almacenado en BD con el hash creado a partir del parámetro pass
+        pass_correcta = check_password_hash(bd_pass, password)
 
-    return render_template('login.html', params=var_data)
+        if pass_correcta:
+            session['usuario'] = usuario
+            session['password'] = password
+            return redirect('/inicio')
+        else:
+            flash("Contraseña incorrecta")
+            return render_template('login.html', params=var_data)
+
+    else: # si entramos por GET
+        return render_template('login.html', params=var_data)
 
 @app.route('/show/<tabla>')
 def show(tabla):
@@ -66,6 +81,7 @@ def add():
 
         # comprobamos que haya nombre en la tabla
         if tabla == "":
+            flash("Introduzca nombre de tabla")
             return render_template("add.html", params=var_data)
 
         # si hay nombre en la tabla empezamos a meter datos en la BD
@@ -116,12 +132,56 @@ def add():
         # el método de llamada es GET
         return render_template("add.html", params=var_data)
 
+@app.route('/logout')
+def logout():
+    session.clear();
+    return redirect('/login')
+
+
+@app.route('/remove')
+def remove():
+
+    if 'usuario' not in session:
+        return "<h1><a href='/login'>Inicie sesión</a> primero.</h1>"
+
+    sql  = "SELECT table_name FROM user_tables ORDER BY table_name"
+    resultados = consulta_bd(sql)
+
+    var_data = {
+        "titulo": "Eliminar tablas",
+        "datos_bd": resultados
+    }
+
+    return render_template("remove.html", params=var_data)
+
+
+@app.route('/remove_table/<tabla>')
+def remove_table(tabla):
+
+    if 'usuario' not in session:
+        return "<h1><a href='/login'>Inicie sesión</a> primero.</h1>"
+
+    sql  = "drop table {}".format(tabla)
+    print("************", sql)
+    resultados = consulta_bd(sql)
+
+    var_data = {
+        "titulo": "Eliminar tablas",
+        "datos_bd": resultados
+    }
+
+    return redirect('/remove')
+
 
 @app.route('/')
 @app.route('/home')
 @app.route('/inicio')
 # muestra por defecto la lista de tablas en la BD
 def index():
+
+    if 'usuario' not in session:
+        return "<h1><a href='/login'>Inicie sesión</a> primero.</h1>"
+
     sql  = "SELECT table_name FROM user_tables ORDER BY table_name"
     lista_temporal = consulta_bd(sql)
 
@@ -164,3 +224,4 @@ def consulta_bd(sql):
 if __name__ == '__main__':
     #app.register_error_handler(404, pagina_no_encontrada)
     app.run(debug=True, port=5000)
+    app.secret_key = "ñhsaFSADfsdi239847adsfSDF(=)(&"

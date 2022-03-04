@@ -2,13 +2,12 @@
 
 {% block title %} {{ params.titulo }} {% endblock %}
 
-{% block titular %} {{ params.titulo }} {% endblock %}
+{% block titular %}<img src="../static/images/login.png" width="100">{% endblock %}
 
 {% block body %}
-
 <form action="{{ url_for('login')  }}" method="POST">
 <input type="text" name="user" id="user" placeholder="usuario" value="jsarmenteros"><br>
-<input type="text" name="pass" id="pass" placeholder="contraseña"><br>
+<input type="password" name="pass" id="pass" placeholder="contraseña"><br>
 <input type="submit"><br>
 </form>
 

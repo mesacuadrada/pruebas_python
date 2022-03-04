@@ -10,17 +10,17 @@
 
     var contador = 0;
 
-
     $(document).ready(function(){ // espera que se carge la página para ejecutarse
-        
         $("#btn_add").bind("click", add_campo);
-        $("#btn_aceptar").bind("click", send_data);
-        $("#btn_add").bind("mouseover", function(){
-            $(this).css("cursor", "pointer");
-        });
+        $("#btn_add").bind("mouseover", cambia_cursor);
+        $("#add_controles img").bind("mouseover", cambia_cursor);
         $("#add_controles img").bind("click", remove_campo);
-        
     });
+
+
+    function cambia_cursor(e){
+        $(this).css("cursor", "pointer");
+    }
 
     function remove_campo(e){
         var elemento = $(e.target).parent();
@@ -33,14 +33,14 @@
         contador++;
         var campo = "campo_" + contador;
         var codigo = "<div id='div_"+contador+"'>"+
-        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo'>" +
+        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo' required>" +
         "<select name='tipo_dato_"+contador+"'>" +
         "<option value='varchar'>VarChar" +
         "<option value='number'>Number" +
         "<option value='date'>Date" +
         "</select>"+
         "<input type='text' id='"+campo+"_len' name='"+campo+"_len' size='1' value='25'>"+
-        "<img id="+contador+" src=\"{{ url_for('static', filename='images/field_remove.png') }}\" width='40'>" +
+        "<img id='btn_remove_"+contador+"' src=\"{{ url_for('static', filename='images/field_remove.png') }}\" width='40'>" +
         "</div>";
 
         $("#add_controles").append(codigo);
@@ -57,7 +57,7 @@
 <center>
     <form action="/add" method="post">
     <div id="add_controles">
-        <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla">
+        <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla" required>
     </div>
     <img src="../static/images/separador2.png">
     <div>

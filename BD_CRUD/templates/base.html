@@ -2,21 +2,29 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-    <meta name="viewport" content="initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="{{ url_for('static', filename='js/jquery360.js') }}"></script>
     <style type="text/css">
-
         h1, h2, a, p {
             font-family: arial;
             color: white;
             font-weight: bold;
         }
 
-        table{
-            border-spacing: 8px;
-            border-collapse: separate;          
+        .message{
+            background-color: goldenrod; opacity: 0.75;
+            color: white;
+            font-size: x-large;
+            padding: 10px;
+            border-radius: 6px;
         }
-        
+
+        table{
+            caret-color: transparent;
+            border-spacing: 8px;
+            border-collapse: separate;
+        }
+
         td{
             text-align: center;
         }
@@ -34,7 +42,7 @@
             text-decoration-color: goldenrod;
 
         }
-        table {
+        .inline {
             display: inline
         }
         input, select {
@@ -47,28 +55,106 @@
             font-size: 18px;
             padding: 10px;
             margin: 5px;
+            caret-color: goldenrod;
         }
+
+        .general{
+            width: 75%;
+            padding: 50px;
+            background-color: rgba(0,0,0,0.25);
+            border-radius: 10px;
+        }
+
+        .strech {
+            max-width: 100%;
+            height: auto;
+            width: auto\9; /* ie8 */
+        }
+
+        body{
+            background-image: url('../static/images/bg2.png');
+        }
+
+        @media (max-width: 600px) {
+
+            .general{
+                width: 100%;
+                padding: 10px;
+                background-color: rgba(0,0,0,0.25);
+                border-radius: 10px;
+            }
+}
+
     </style>
+
+    <script>
+        /*
+            $(document).ready(function(){ // espera que se carge la página para ejecutarse
+                var path = "../static/images/bg" + Math.floor((Math.random() * 2) + 1) + ".png";
+                document.getElementsByTagName("body")[0].style = "background-image: url('" + path +"')";
+                console.log(path)
+            });
+        */
+    </script>
 
     {% block head%}{% endblock %}
 
 </head>
-<body bgcolor="#777" background="../static/images/bg1.png">
+
+<body bgcolor="gray">
+
+    <br>
 
     <center>
-    <h1><a href="{{ url_for('index') }}">BD CRUD</a></h1>
-    <img src="../static/images/separador2.png"><br>
-    <h2>{% block titular %}{% endblock %}</h2>
-    <div id="tablas" style="width: auto">
-    <img src="../static/images/separador2.png"><br>
-    
 
-    {% block body %}
-    {% endblock %}
+    <table class="general" border=0>
+    <tr><td>
+        <a href="{{ url_for('remove') }}"><img src="../static/images/bd_remove.png" title="Eliminar tabla" width="30"></a>
+    </td>
+    <td>
+        <h1><a href="{{ url_for('index') }}">BD CRUD</a></h1></td>
+    <td>
 
-    </div>
+        {% if 'usuario' in session %}
+            <a href="{{ url_for('logout') }}"><img src="../static/images/logout.png" title="Cerrar sesión" width="30"></a>
+        {% endif %}
+
+    </td></tr>
+    <tr><td colspan="3">
+
+        <img src="../static/images/separador2.png" class="strech"><br>
+        <h2>{% block titular %}{% endblock %}</h2>
+
+        <div id="tablas">
+
+            <img src="../static/images/separador2.png" class="strech">
+
+            <br>
+            <br>
+
+
+            {% with messages = get_flashed_messages() %}
+
+                {% if messages %}
+
+                    {% for msg in messages %}
+                    <span class="message">{{ msg }}</span><br><br>
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            {% block body %}
+            {% endblock %}
+
+        </div>
+
+    </td></tr>
+    </table>
+
     </center>
-
 
 </body>
 </html>

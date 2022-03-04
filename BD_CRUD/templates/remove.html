@@ -10,7 +10,7 @@
         {% for celdas in filas: %}
             <table class="inline">
             <tr><td>
-                <a href="{{ url_for('show', tabla=celdas)}}"><img src="{{ url_for('static', filename='images/bd.png') }}" width="100"></a>
+                <a href="{{ url_for('remove_table', tabla=celdas)}}"><img src="{{ url_for('static', filename='images/bd_remove.png') }}" width="100"></a>
             </td></tr>
             <tr><td align="center">
                 <p>{{ celdas }}
@@ -18,14 +18,5 @@
             </table>
         {% endfor %}
     {% endfor %}
-
-    <table align="center">
-    <tr><td>
-        <a href="{{ url_for('add')}}"><img src="{{ url_for('static', filename='images/bd_add.png') }}" width="100"></a>
-    </td></tr>
-    <tr><td align="center">
-        <p>Añadir Tabla
-    </td></tr>
-    </table>
 
     {% endblock %}
