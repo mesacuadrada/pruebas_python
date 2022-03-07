@@ -11,12 +11,38 @@
 $(document).ready(function(){ // espera que se carge la página para ejecutarse
         $("#btn_insert").bind("click", haz_submit);
         $("#btn_insert").bind("mouseover", cambia_cursor);
-        $("#add_controles img").bind("mouseover", cambia_cursor);
-        $("#add_controles img").bind("click", remove_campo);
-    });
+        $("img").bind("mouseover", cambia_cursor);
+        $("img[id^='add_controles']").bind("click", remove_campo);
+        $("input").bind("click", registra_cambios);
+});
+
+    function registra_cambios(e){
+        // subimos 2 niveles desde donde estamos para coger el id del contenedor
+        padre = $(this).parent().parent().attr('id');
+        console.log(padre);
+        elementos = "";
+        $("#"+padre).find(":text").each(function(){
+                    //console.log( $(this).attr('id') + " : " + $(this).val() );
+                    elementos += $(this).val() + ",";
+        });
+        console.log(elementos);
+/*
+        padre_bueno = document.getElementById(padre).children;
+        lista_valores = "[";
+
+        $(padre_bueno).each(
+            function(){
+                elemento = $(this).find("input").val();
+                lista_valores += elemento + ",";
+            }
+        );
+        lista_valores = lista_valores.slice(0, -1);
+        lista_valores += "]";
+        console.log(lista_valores);
+*/
+    }
 
     function haz_submit(){
-
         document.getElementById("form_insercion").submit();
 
         /*
@@ -43,12 +69,12 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
         $(this).css("cursor", "pointer");
     }
 
+
 </script>
 
 {% endblock %}
 
 {% block body %}
-
 
 <table border=0>
     <tr>
@@ -72,13 +98,15 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
     </tr>
 
     {% for fila in registros: %}
-    <tr id="add_controles">
-        {% for celda in fila %}
-           <td><input type="text" size="5" value="{{ celda }}"> </td>
-        {% endfor %}
-    <td><img src="../static/images/field_remove.png" width='40'"></td>
-    </tr>
+        <tr id="add_controles_{{ loop.index }}">
+            {% for celda in fila %}
+            <td id="td_{{loop.index}}"><input id="campo_{{ loop.index }}" type="text" size="5" value="{{ celda }}"></td>
+            {% endfor %}
+        <td id="remove"><img src="../static/images/field_remove.png" width='40'" id="img"></td></tr>
     {% endfor %}
+    </table>
+
+    <table border=0>
     <tr><td colspan="{{ columnas|length +1 }}">
         <img src="../static/images/separador2.png" class="strech">
     </td></tr>
@@ -89,7 +117,8 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
             action="{{ url_for('insert') }}"
             method="POST"
         >
-        <input type="hidden" name="tabla" value="{{ params.titulo }}">
+        <input type="hidden" name="tabla" id="tabla" value="{{ params.titulo }}">
+        <!-- <input type="hidden" name="pk" value="{{ pk }}"> -->
 
     <tr>
 
@@ -97,16 +126,14 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
 {% for i in range(columnas|length): %}
 
     {% if loop.last %}
-        <td><input type="text" size="5" name="campo_{{i}}"></td>
+        <td><input type="text" size="5" name="campo_{{i}}" id="campo_{{i}}"></td>
         <td><img id="btn_insert" src="../static/images/field_add.png" width="40"></td>
     {% else %}
-        <td><input type="text" size="5" name="campo_{{i}}"></td>
+        <td><input type="text" size="5" name="campo_{{i}}" id="campo_{{i}}"></td>
     {% endif %}
 
 {% endfor %}
-    </tr>
+    </tr></table>
 </from>
-
-</table>
 
 {% endblock %}

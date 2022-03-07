@@ -1,5 +1,6 @@
 import re
 from flask import Flask, flash, render_template, request, redirect, url_for, jsonify, session
+from markupsafe import Markup
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_mysqldb import MySQL
 import cx_Oracle
@@ -68,8 +69,30 @@ def show(tabla):
     var_registros = consulta_bd("SELECT * FROM {}".format(tabla))
     # recuperamos el nombre de las columnas para mostrarlo
     var_columnas = consulta_bd("SELECT column_name FROM all_tab_columns WHERE table_name ='" + tabla  + "'")
+    var_sql = """
+            SELECT cols.column_name
+            FROM all_constraints cons, all_cons_columns cols
+            WHERE cols.table_name = '{}'
+            AND cons.constraint_type = 'P'
+            AND cons.constraint_name = cols.constraint_name
+            AND cons.owner = cols.owner
+            ORDER BY cols.table_name, cols.position
+        """.format(tabla)
 
-    return render_template("show.html", params=var_data, registros=var_registros, columnas=var_columnas)
+    var_pk = consulta_bd(var_sql)
+
+    # ritual para quitar los carácteres que devuelve Oracle en sus resultados = (' ')
+    for fila in var_pk:
+        for celda in fila:
+            var_pk = celda
+
+    if len(var_pk) == 0:
+        # enviamos un mensaje flask con contenido HTML
+        flash(
+            Markup("Esta tabla no tiene <i><b>primary key</b></i>, no se podrá operar sobre ella")
+        )
+
+    return render_template("show.html", params=var_data, pk=var_pk, registros=var_registros, columnas=var_columnas)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/add', methods=["GET", "POST"])
 def add():
