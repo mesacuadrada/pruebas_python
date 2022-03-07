@@ -9,14 +9,17 @@
 <script>
 
 $(document).ready(function(){ // espera que se carge la página para ejecutarse
-        $("#btn_insert").bind("click", submit());
+        $("#btn_insert").bind("click", haz_submit);
         $("#btn_insert").bind("mouseover", cambia_cursor);
         $("#add_controles img").bind("mouseover", cambia_cursor);
         $("#add_controles img").bind("click", remove_campo);
     });
 
-    function insert_campo(){
+    function haz_submit(){
 
+        document.getElementById("form_insercion").submit();
+
+        /*
         sql = "insert into {{ params.titulo }} values(";
         elements = document.getElementById("form_insercion").elements;
 
@@ -29,6 +32,7 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
         console.log(resultado+")");
 
         return false;
+        */
     }
 
     function remove_campo(){
@@ -79,10 +83,14 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
         <img src="../static/images/separador2.png" class="strech">
     </td></tr>
 
-<form name="form_insercion"
-    id ="form_insercion"
-    action="{{ url_for('insert') }}"
-    method="POST">
+        <form
+            name="form_insercion"
+            id ="form_insercion"
+            action="{{ url_for('insert') }}"
+            method="POST"
+        >
+        <input type="hidden" name="tabla" value="{{ params.titulo }}">
+
     <tr>
 
 <!-- forma de acceder a las propiedades de un objeto-->

@@ -51,13 +51,11 @@ def login():
         return render_template('login.html', params=var_data)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+@app.route('/remove_row')
+def remove_row():
+    pass
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/show/<tabla>')
-@app.route('/show/<tabla>/<campos>')
-def show(tabla, campos):
-
-    if inicio_sesion() == False:
-        return redirect('/login');
-
 def show(tabla):
 
     if inicio_sesion() == False:
@@ -163,12 +161,37 @@ def remove():
 
     return render_template("remove.html", params=var_data)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-@app.route('/insert')
+
+@app.route('/insert', methods=['POST', 'GET'])
 def insert():
 
-    dict = request.form
-    for key in dict:
-        print('form key '+dict[key])
+    var_data = {
+        "titulo": "Mostrando tabla"
+    }
+
+    if request.method != "POST":
+        return render_template("show.html", params=var_data)
+
+    parametros = request.form
+
+    tabla = ""
+    valores = ""
+
+    for clave in parametros:
+
+        if clave == "tabla":
+            tabla = parametros[clave]
+            continue
+
+        valores += "'" + parametros[clave] + "', "
+
+    valores = valores.rstrip(", ")
+    sql = "insert into {} values({})".format(tabla, valores);
+    print(consulta_bd(sql))
+
+    return redirect("show/" + tabla)
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/remove_table/<tabla>')
 def remove_table(tabla):
