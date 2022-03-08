@@ -7,63 +7,60 @@
 {% block head%}
 
 <script>
+// formato diccionario {'clave1':'valor1','clave2':'valor2'}
+lista_valores = "[";
 
 $(document).ready(function(){ // espera que se carge la página para ejecutarse
         $("#btn_insert").bind("click", haz_submit);
         $("#btn_insert").bind("mouseover", cambia_cursor);
         $("img").bind("mouseover", cambia_cursor);
-        $("img[id^='add_controles']").bind("click", remove_campo);
-        $("input").bind("click", registra_cambios);
+        $("img[id^='add_controles']").bind("click", elimina_campo);
+        $("input").bind("change", registra_cambios);
+        $("#img_save").bind("click", guarda_cambios);
+        $("#img_save").css("display","none");
 });
 
     function registra_cambios(e){
         // subimos 2 niveles desde donde estamos para coger el id del contenedor
         padre = $(this).parent().parent().attr('id');
-        console.log(padre);
+        //console.log(padre);
         elementos = "";
         $("#"+padre).find(":text").each(function(){
-                    //console.log( $(this).attr('id') + " : " + $(this).val() );
-                    elementos += $(this).val() + ",";
-        });
-        console.log(elementos);
-/*
-        padre_bueno = document.getElementById(padre).children;
-        lista_valores = "[";
-
-        $(padre_bueno).each(
-            function(){
-                elemento = $(this).find("input").val();
-                lista_valores += elemento + ",";
+                //console.log( $(this).attr('id') + " : " + $(this).val() );
+                elementos += "'" + $(this).attr('id') + "':'" + $(this).val() + "',";
             }
         );
-        lista_valores = lista_valores.slice(0, -1);
-        lista_valores += "]";
-        console.log(lista_valores);
-*/
+        lista_valores += "{" + elementos.slice(0, -1) + "},";
+        $("#img_save").css("display","block");
     }
+
 
     function haz_submit(){
         document.getElementById("form_insercion").submit();
-
-        /*
-        sql = "insert into {{ params.titulo }} values(";
-        elements = document.getElementById("form_insercion").elements;
-
-        for (i=0; i<elements.length; i++){
-            sql += elements[i].value + ", ";
-        }
-
-        // quitamos la última coma añadida por el bucle
-        resultado = sql.slice(0, -2);
-        console.log(resultado+")");
-
-        return false;
-        */
     }
 
-    function remove_campo(){
+
+    function elimina_campo(){
         return false;
     }
+
+
+    function guarda_cambios(){
+        lista_valores = lista_valores.slice(0, -1);
+        lista_valores += "]";
+        console.log(lista_valores);
+
+        $.ajax({
+            url: '/update_row',
+            type: 'POST',
+            data: {dic: lista_valores},
+            success: function(response) {
+                var new_html = index.html;
+            }
+        });
+
+    }
+
 
     function cambia_cursor(e){
         $(this).css("cursor", "pointer");
@@ -135,5 +132,7 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
 {% endfor %}
     </tr></table>
 </from>
+
+<img src="../static/images/save.png" id="img_save">
 
 {% endblock %}

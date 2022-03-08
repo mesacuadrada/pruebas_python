@@ -55,6 +55,20 @@ def login():
 @app.route('/remove_row')
 def remove_row():
     pass
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+@app.route('/update_row', methods=["GET", "POST"])
+def update_row():
+    if request.method=='POST':
+        usuario = request.form['dic']
+    else:
+        usuario = request.args['dic']
+
+    print("******************", usuario)
+    return redirect('/login');
+
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/show/<tabla>')
 def show(tabla):
