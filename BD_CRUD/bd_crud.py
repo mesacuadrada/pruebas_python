@@ -61,6 +61,11 @@ def remove_row():
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/update_row', methods=["GET", "POST"])
 def update_row():
+
+    # si no se ha iniciado sesión, lo mandamos al login
+    if inicio_sesion() == False:
+        return redirect('/login');
+
     if request.method=='POST':
         row = request.form['dic']
         pk = request.form['pk']
@@ -124,7 +129,6 @@ def update_row():
 
     #print(type(row))
     return redirect('/login');
-
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -235,11 +239,13 @@ def add():
     else:
         # el método de llamada es GET
         return render_template("add.html", params=var_data)
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/logout')
 def logout():
     session.clear();
     return redirect('/login')
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/remove')
 def remove():
@@ -260,6 +266,10 @@ def remove():
 
 @app.route('/insert', methods=['POST', 'GET'])
 def insert():
+
+    # si no se ha iniciado sesión, lo mandamos al login
+    if inicio_sesion() == False:
+        return redirect('/login');
 
     var_data = {
         "titulo": "Mostrando tabla"
@@ -323,6 +333,7 @@ def index():
     }
 
     return render_template("index.html", params=var_data)
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 def inicio_sesion():
 
@@ -331,6 +342,7 @@ def inicio_sesion():
     else:
         flash ("Inicie sesión para continuar")
         return False
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # hace una consulta a la BD
 def consulta_bd(sql):
