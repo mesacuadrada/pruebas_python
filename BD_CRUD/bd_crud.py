@@ -1,3 +1,5 @@
+from collections import defaultdict
+from pickle import POP_MARK
 import re
 from flask import Flask, flash, render_template, request, redirect, url_for, jsonify, session
 from markupsafe import Markup
@@ -60,11 +62,67 @@ def remove_row():
 @app.route('/update_row', methods=["GET", "POST"])
 def update_row():
     if request.method=='POST':
-        usuario = request.form['dic']
+        row = request.form['dic']
+        pk = request.form['pk']
+        tabla = request.form['tabla']
     else:
-        usuario = request.args['dic']
+        row = request.args['dic']
+        pk = request.args['pk']
+        tabla = request.args['tabla']
 
-    print("******************", usuario)
+    dic = eval(row) # pasamos de string a diccionario
+    """ Warnings when using eval()
+    Consider a situation where you are using a Unix system (macOS, Linux etc) and you
+    have imported the os module. The os module provides a portable way to use operating
+    system functionalities like reading or writing to a file.
+    If you allow users to input a value using eval(input()), the user may issue
+    commands to change file or even delete all the files using the command:
+    os.system('rm -rf *')."""
+    # print("primary key: " +  pk)
+
+    var_columnas = consulta_bd("SELECT column_name FROM all_tab_columns WHERE table_name ='" + tabla  + "'")
+    lista_columnas = []
+    pos_pk = -1
+
+    # para hacer el update necesitamos identificar la columna con el PK.
+    # para saber qué columna es la PK primero obtenemos los nombres de las columnas
+    # recorremos la lista con los nombres en busca de la palabra que sabemos que es la PK
+    # cuando encontremos la palabra, nos quedamos con la posición, que será la misma
+    # que tenga el listado con los valores a modificar
+
+    # ritual para acceder a los datos de la lista sin (' ')
+    for col in var_columnas:
+        for dato in col:
+            # creamos una lista a partir de los datos de la tupla
+            lista_columnas.append(dato)
+            # si coincide el dato con la pk nos quedamos con la posición en la lista
+            # porque coincidirá con la posición del dato en la tabla q es clave primaria
+            if pk in dato:
+                pos_pk = lista_columnas.index(dato)
+
+    contador = 0
+    for fila in dic:
+        contador = 0
+        sql="UPDATE {} SET ".format(tabla)
+        campo__where_pk = ""
+        campo_where = ""
+        for celda in fila:
+            # si coincide el ídnice del PK con el actual, estamos ante el campo PK de la tabla
+            if contador == pos_pk:
+                sql += "{}='{}', ".format(lista_columnas[contador], fila[celda])
+                campo_pk = lista_columnas[contador]
+                campo_where = fila[celda]
+            else:
+                sql += "{}='{}', ".format(lista_columnas[contador], fila[celda])
+            contador += 1
+        # quitamos los 2 úlitmos carácteres añadidos en el bucle
+        sql = sql[:-2]
+        sql += " WHERE {} = '{}'".format(campo_pk, campo_where)
+        print(sql)
+        consulta_bd(sql)
+
+
+    #print(type(row))
     return redirect('/login');
 
 
@@ -81,6 +139,7 @@ def show(tabla):
     }
 
     var_registros = consulta_bd("SELECT * FROM {}".format(tabla))
+
     # recuperamos el nombre de las columnas para mostrarlo
     var_columnas = consulta_bd("SELECT column_name FROM all_tab_columns WHERE table_name ='" + tabla  + "'")
     var_sql = """
@@ -170,7 +229,7 @@ def add():
         sql = sql.rstrip(", ")
         sql += ")" # las sentencias SQL NO deben acabar en ; lanzan error: ORA-00922: falta la opción o no es válida
 
-        print(consulta_bd(sql))
+        consulta_bd(sql)
         return redirect('/inicio')
 
     else:
@@ -224,7 +283,7 @@ def insert():
 
     valores = valores.rstrip(", ")
     sql = "insert into {} values({})".format(tabla, valores);
-    print(consulta_bd(sql))
+    consulta_bd(sql)
 
     return redirect("show/" + tabla)
 
@@ -237,7 +296,6 @@ def remove_table(tabla):
         return redirect('/login');
 
     sql  = "drop table {}".format(tabla)
-    print("************", sql)
     resultados = consulta_bd(sql)
 
     var_data = {
@@ -276,7 +334,6 @@ def inicio_sesion():
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # hace una consulta a la BD
 def consulta_bd(sql):
-
         try:
             connection = cx_Oracle.connect(
                 user="jsarmenteros",
@@ -284,23 +341,21 @@ def consulta_bd(sql):
                 dsn="localhost:1521/orcl",
                 encoding="UTF-8"
             )
-
-            #print("*************** ", connection.version)
-
+            # print("*************** ", connection.version)
             cur = connection.cursor()
             query = "alter session set \"_use_nosegment_indexes\" = true"
             cur.execute(query)
             cur.execute(sql)
             connection.commit()
-
             return cur.fetchall()
-
         except Exception as ex:
             print(ex)
         finally:
             connection.close()
-            print("Conexión cerrada")
+            # print("Conexión cerrada")
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 if __name__ == '__main__':
     #app.register_error_handler(404, pagina_no_encontrada)
     app.run(debug=True, port=5000)

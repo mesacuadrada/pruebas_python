@@ -7,15 +7,16 @@
 {% block head%}
 
 <script>
-// formato diccionario {'clave1':'valor1','clave2':'valor2'}
 lista_valores = "[";
 
 $(document).ready(function(){ // espera que se carge la página para ejecutarse
         $("#btn_insert").bind("click", haz_submit);
         $("#btn_insert").bind("mouseover", cambia_cursor);
         $("img").bind("mouseover", cambia_cursor);
-        $("img[id^='add_controles']").bind("click", elimina_campo);
-        $("input").bind("change", registra_cambios);
+        // [id^=hola] empieza por hola
+        // [id$=hola] termina por hola
+        $("[id^=add_controles] img").bind("click", elimina_campo);
+        $("[id^=add_controles] input").bind("change", registra_cambios);
         $("#img_save").bind("click", guarda_cambios);
         $("#img_save").css("display","none");
 });
@@ -53,9 +54,9 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
         $.ajax({
             url: '/update_row',
             type: 'POST',
-            data: {dic: lista_valores},
+            data: {dic: lista_valores, pk:"{{ pk}}", tabla:"{{params.titulo}}"},
             success: function(response) {
-                var new_html = index.html;
+                $("#img_save").css("display","none");
             }
         });
 
@@ -97,7 +98,7 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
     {% for fila in registros: %}
         <tr id="add_controles_{{ loop.index }}">
             {% for celda in fila %}
-            <td id="td_{{loop.index}}"><input id="campo_{{ loop.index }}" type="text" size="5" value="{{ celda }}"></td>
+            <td id="td_{{loop.index}}"><input id="campo_{{ loop.index -1 }}" type="text" size="5" value="{{ celda }}"></td>
             {% endfor %}
         <td id="remove"><img src="../static/images/field_remove.png" width='40'" id="img"></td></tr>
     {% endfor %}
