@@ -54,9 +54,43 @@ def login():
         return render_template('login.html', params=var_data)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-@app.route('/remove_row')
+@app.route('/remove_row', methods=["GET", "POST"])
 def remove_row():
-    pass
+
+    # si no se ha iniciado sesión, lo mandamos al login
+    if inicio_sesion() == False:
+        return redirect('/login');
+
+    if request.method=='POST':
+        row = request.form['dic']
+        tabla = request.form['tabla']
+    else:
+        return redirect('/inicio');
+
+    dic = eval(row)
+    print(dic)
+
+    var_columnas = consulta_bd("SELECT column_name FROM all_tab_columns WHERE table_name ='" + tabla  + "'")
+    lista_columnas = []
+
+    # recuepramos los nombres de las columnas para montar el delete
+    for filas in var_columnas:
+        for celdas in filas:
+            lista_columnas.append(celdas)
+
+    sql = "DELETE FROM {} WHERE ".format(tabla);
+
+    # montamos la consulta con las columnas y valores de sendas listas
+    i = 0;
+    for fila in dic:
+        sql += "{} = '{}' AND ".format(lista_columnas[i], dic[fila])
+        i += 1
+
+    sql = sql[:-4]
+    #rint(sql)
+    consulta_bd(sql)
+
+    return redirect('/show/' + tabla);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/update_row', methods=["GET", "POST"])
@@ -75,19 +109,20 @@ def update_row():
         pk = request.args['pk']
         tabla = request.args['tabla']
 
-    dic = eval(row) # pasamos de string a diccionario
-    """ Warnings when using eval()
-    Consider a situation where you are using a Unix system (macOS, Linux etc) and you
+    # pasamos de string a diccionario
+    dic = eval(row)
+    """ Warnings when using eval():
+    Consider a situation where you are using a Unix system (macOS, Linux, etc) and you
     have imported the os module. The os module provides a portable way to use operating
     system functionalities like reading or writing to a file.
     If you allow users to input a value using eval(input()), the user may issue
     commands to change file or even delete all the files using the command:
     os.system('rm -rf *')."""
-    # print("primary key: " +  pk)
 
+    # print("primary key: " +  pk)
     var_columnas = consulta_bd("SELECT column_name FROM all_tab_columns WHERE table_name ='" + tabla  + "'")
     lista_columnas = []
-    pos_pk = -1
+    pos_pk = 0
 
     # para hacer el update necesitamos identificar la columna con el PK.
     # para saber qué columna es la PK primero obtenemos los nombres de las columnas
@@ -109,7 +144,6 @@ def update_row():
     for fila in dic:
         contador = 0
         sql="UPDATE {} SET ".format(tabla)
-        campo__where_pk = ""
         campo_where = ""
         for celda in fila:
             # si coincide el ídnice del PK con el actual, estamos ante el campo PK de la tabla
@@ -126,9 +160,8 @@ def update_row():
         print(sql)
         consulta_bd(sql)
 
-
     #print(type(row))
-    return redirect('/login');
+    return redirect('/show/' + tabla);
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -166,7 +199,7 @@ def show(tabla):
     if len(var_pk) == 0:
         # enviamos un mensaje flask con contenido HTML
         flash(
-            Markup("Esta tabla no tiene <i><b>primary key</b></i>, no se podrá operar sobre ella")
+            Markup("Esta tabla no tiene <i><b>primary key</b></i>, se tomará la primera columna como identificador")
         )
 
     return render_template("show.html", params=var_data, pk=var_pk, registros=var_registros, columnas=var_columnas)
