@@ -6,14 +6,11 @@ from markupsafe import Markup
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_mysqldb import MySQL
 import cx_Oracle
+cx_Oracle.init_oracle_client(lib_dir=r"C:\instantclient")
 
 app = Flask(__name__)
 
 # conexión MySQL
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'jsarmenteros'
-app.config['MYSQL_PASSWORD'] = "Jm)GCELdIwA0hBlI"
-app.config['MYSQL_DB'] = "proyecto_final"
 app.config['SECRET_KEY'] = 'GFeqrwt·$%dsafg$&%/"·'
 
 conn = MySQL(app)
@@ -24,15 +21,18 @@ def login():
         "titulo": "Login"
     }
 
+    #print(">>" + generate_password_hash("123456")+ "<<")
+
     if request.method == "POST":
 
         usuario = request.form.get('user')
         password = request.form.get('pass')
 
         # si hay nombre en la tabla empezamos a meter datos en la BD
-        sql = "SELECT password FROM usuarios WHERE usuario = 'jsarmenteros'"
+        sql = "SELECT password FROM usuarios WHERE username = 'jsarmenteros'"
         var_registros = consulta_bd(sql)
         bd_pass = ""
+        print(var_registros)
 
         # recorremos la fila y sacamos el valor
         for fila in var_registros:
@@ -40,6 +40,7 @@ def login():
                 bd_pass = celda
 
         # comparamos el hash almacenado en BD con el hash creado a partir del parámetro pass
+        print(bd_pass +">>>>> "+ password)
         pass_correcta = check_password_hash(bd_pass, password)
 
         if pass_correcta:
@@ -87,10 +88,16 @@ def remove_row():
         i += 1
 
     sql = sql[:-4]
-    #rint(sql)
+    #print(sql)
     consulta_bd(sql)
 
-    return redirect('/show/' + tabla);
+    #return redirect('/show/' + tabla);
+    var_data = {
+        "titulo": tabla
+    }
+
+    return redirect('/show/' + tabla)
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 @app.route('/update_row', methods=["GET", "POST"])
@@ -204,7 +211,7 @@ def show(tabla):
 
     return render_template("show.html", params=var_data, pk=var_pk, registros=var_registros, columnas=var_columnas)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-@app.route('/add', methods=["GET", "POST"])
+@app.route('/add_table', methods=["GET", "POST"])
 def add():
 
     if inicio_sesion() == False:
@@ -234,6 +241,9 @@ def add():
         lista = dict(request.form)
         print(lista.items)
         '''
+        contador = 0
+        pk = ""
+
         for clave in request.form:
 
             # saltamos el primer valor que es el nombre de la tabla
@@ -242,6 +252,10 @@ def add():
 
             # accedemos al valor de una clave del formulario
             valor = request.form.get(clave)
+
+            #print("contador {} clave {} valor {}".format(contador, clave, valor))
+            if contador == 0:
+                pk = valor
 
             # comprobamos que el tipo de dato sea Date para no meter longitud en él
             if "date" in valor:
@@ -252,7 +266,13 @@ def add():
 
                 if es_date == False:
                     sql = sql.rstrip(" ") # quitamos el espacio dejado por la ultima vuelta
-                    valor = "({}),".format(valor)
+
+                    # hacemos la primera columna not null y guardamos su valor para hacerla PK
+                    if contador == 2:
+                            valor = "({}) NOT NULL, ".format(valor)
+                    else:
+                            valor = "({}),".format(valor)
+
                 else:
                     # si es fecha no se imprime el valor actual
                     sql = sql.rstrip(" ") # quitamos el espacio dejado por la ultima vuelta
@@ -260,12 +280,16 @@ def add():
                     es_date = False
                     continue
 
+            contador +=1
+
             sql += "{} ".format(valor)
 
-        # eliminamos ", " dejado por la última pasada del bucle
-        sql = sql.rstrip(", ")
-        sql += ")" # las sentencias SQL NO deben acabar en ; lanzan error: ORA-00922: falta la opción o no es válida
 
+        # eliminamos ", " dejado por la última pasada del bucle
+        sql += "primary key ({})".format(pk)
+        #sql = sql.rstrip(", ")
+        sql += ")" # las sentencias SQL NO deben acabar en ; lanzan error: ORA-00922: falta la opción o no es válida
+        print(sql)
         consulta_bd(sql)
         return redirect('/inicio')
 
@@ -338,6 +362,10 @@ def remove_table(tabla):
     if inicio_sesion() == False:
         return redirect('/login');
 
+    if tabla == "USUARIOS":
+        flash("No se puede eliminar la tabla USUARIOS")
+        return redirect('/remove')
+
     sql  = "drop table {}".format(tabla)
     resultados = consulta_bd(sql)
 
@@ -379,6 +407,7 @@ def inicio_sesion():
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # hace una consulta a la BD
 def consulta_bd(sql):
+
         try:
             connection = cx_Oracle.connect(
                 user="jsarmenteros",
@@ -386,7 +415,7 @@ def consulta_bd(sql):
                 dsn="localhost:1521/orcl",
                 encoding="UTF-8"
             )
-            # print("*************** ", connection.version)
+            #print("*************** ", connection.version)
             cur = connection.cursor()
             query = "alter session set \"_use_nosegment_indexes\" = true"
             cur.execute(query)
@@ -395,6 +424,10 @@ def consulta_bd(sql):
             return cur.fetchall()
         except Exception as ex:
             print(ex)
+
+            if str((ex)).lower() != "not a query":
+                flash(str(ex))
+
         finally:
             connection.close()
             # print("Conexión cerrada")

@@ -55,6 +55,10 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
             url: '/remove_row',
             type: 'POST',
             data: {dic: dic_valores, pk:"{{ pk}}", tabla:"{{params.titulo}}"},
+            success: function(response) {
+                location.href = "/show/{{params.titulo}}";
+            }
+
         });
 
     }

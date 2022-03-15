@@ -15,38 +15,61 @@
         $("#btn_add").bind("mouseover", cambia_cursor);
         $("#add_controles img").bind("mouseover", cambia_cursor);
         $("#add_controles img").bind("click", remove_campo);
+        contador =  document.getElementById("add_controles").childElementCount;
     });
 
+
+    function remove_campo(e){
+        var elemento = $(e.target).parent();
+        elemento.css("background-color", "goldenrod");
+        //elemento.fadeOut(250, function(){elemento.html("")});
+        elemento.fadeOut(250, function(){
+                elemento.remove();
+                contador = document.getElementById("add_controles").childElementCount;
+                console.log(contador);
+            }
+        );
+    }
+
+    function add_campo(){
+        var campo = "campo_" + contador;
+        var codigo ="<div id='div_"+contador+"'>\n";
+        contador =  document.getElementById("add_controles").childElementCount;
+
+        // sie stamos ante el primer child ponemos el icono de la PK
+        if(contador == 1){
+            codigo += "<img id='btn_remove_"+contador+"' src=\"{{ url_for('static', filename='images/key.png') }}\" width='40'>\n";
+        }
+
+        codigo +=
+        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo' required>\n" +
+        "<select name='tipo_dato_"+contador+"'>\n" +
+        "  <option value='varchar'>VarChar\n" +
+        "  <option value='number'>Number\n" +
+        "  <option value='date'>Date\n" +
+        "</select>\n\n"+
+        "<input type='text' id='"+campo+"_len' name='"+campo+"_len' size='1' value='25'>\n";
+
+        // si no estamos ante el primer child ponemos el icono de borrar campo
+        if(contador != 1){
+            codigo += "<img id='btn_remove_"+contador+"' src=\"{{ url_for('static', filename='images/field_remove.png') }}\" width='40'>\n";
+        }
+
+        codigo += "</div>\n\n";
+
+        $("#add_controles").append(codigo);
+        $("#add_controles img").bind("click", remove_campo);
+        $("#add_controles img").bind("mouseover", cambia_cursor);
+
+        contador =  document.getElementById("add_controles").childElementCount;
+        console.log(contador);
+
+    }
 
     function cambia_cursor(e){
         $(this).css("cursor", "pointer");
     }
 
-    function remove_campo(e){
-        var elemento = $(e.target).parent();
-        elemento.css("background-color", "goldenrod");
-        elemento.fadeOut(250, function(){elemento.html("")})
-    }
-
-
-    function add_campo(){
-        contador++;
-        var campo = "campo_" + contador;
-        var codigo = "<div id='div_"+contador+"'>"+
-        "<input type='text' name="+campo+" id='"+campo+"' placeholder='nombre campo' required>" +
-        "<select name='tipo_dato_"+contador+"'>" +
-        "<option value='varchar'>VarChar" +
-        "<option value='number'>Number" +
-        "<option value='date'>Date" +
-        "</select>"+
-        "<input type='text' id='"+campo+"_len' name='"+campo+"_len' size='1' value='25'>"+
-        "<img id='btn_remove_"+contador+"' src=\"{{ url_for('static', filename='images/field_remove.png') }}\" width='40'>" +
-        "</div>";
-
-        $("#add_controles").append(codigo);
-        $("#add_controles img").bind("click", remove_campo);
-
-    }
 
 </script>
 
@@ -54,22 +77,26 @@
 
 {% block body %}
 
-<center>
-    <form action="/add" method="post">
+    <form action="/add_table" method="post">
+
+    <!-- start div add_controles-->
     <div id="add_controles">
         <input type="text" name="nombre_tabla" id="nombre_tabla" placeholder="Nombre tabla" required>
     </div>
+    <!-- end div add_controles -->
+
     <img src="../static/images/separador2.png">
-    <div>
-        <script>add_campo();</script>
-        <img id="btn_add" src="{{ url_for('static', filename='images/field_add.png') }}" width='40'>
-    </div>
+
+    <br>
+    <script>add_campo();</script>
+    <img id="btn_add" src="{{ url_for('static', filename='images/field_add.png') }}" width='40'>
+    <br>
     <br>
     <input type="submit" id="btn_aceptar" value=" ACEPTAR ">
     </form>
 
-    <div id="txt_resultados"></div>
+<!--    <div id="txt_resultados"></div>  -->
+    <input type="button" value="ver DOM" onclick="console.log(document.getElementsByTagName('body')[0].innerHTML);">
 
-</center>
 
 {% endblock %}

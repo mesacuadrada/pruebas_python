@@ -39,13 +39,8 @@
         <h2>{% block titular %}{% endblock %}</h2>
 
         <div id="tablas">
-
             <img src="../static/images/separador2.png" class="strech">
-
-            <br>
-            <br>
-
-
+            <br><br>
             {% with messages = get_flashed_messages() %}
 
                 {% if messages %}
@@ -58,12 +53,10 @@
 
             {% endwith %}
 
-            <center>
             {% block body %}
             {% endblock %}
-            </center>
 
-        </div>
+        </div> <!-- id= tablas -->
 
     </td></tr>
     </table>
