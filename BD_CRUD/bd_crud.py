@@ -32,7 +32,6 @@ def login():
         sql = "SELECT password FROM usuarios WHERE username = 'jsarmenteros'"
         var_registros = consulta_bd(sql)
         bd_pass = ""
-        print(var_registros)
 
         # recorremos la fila y sacamos el valor
         for fila in var_registros:
@@ -40,7 +39,6 @@ def login():
                 bd_pass = celda
 
         # comparamos el hash almacenado en BD con el hash creado a partir del parámetro pass
-        print(bd_pass +">>>>> "+ password)
         pass_correcta = check_password_hash(bd_pass, password)
 
         if pass_correcta:
