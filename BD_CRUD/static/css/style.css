@@ -7,11 +7,13 @@ h1, h2, a, p {
 	font-weight: bold;
 }
 
-.message{
+.mensajes{
 	background-color: darkred; opacity: 0.75;
 	color: white;
 	font-size:medium;
 	padding: 10px;
+	margin: auto;
+	display: table;
 	border-radius: 6px;
 }
 
@@ -41,6 +43,11 @@ a{
 .inline {
 	display: inline
 }
+
+.input_auto_width{
+	width: 75%;
+}
+
 input, select {
 	border-radius: 6px;
 	border: 3px solid white;
@@ -52,7 +59,7 @@ input, select {
 	padding: 10px;
 	margin: 5px;
 	caret-color: goldenrod;
-	width: 80%;
+	width: auto;
 }
 
 .general{

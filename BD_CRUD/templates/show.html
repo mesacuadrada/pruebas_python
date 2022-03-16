@@ -20,6 +20,7 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
         $("[id^=add_controles] input").bind("change", registra_cambios);
         $("#img_save").bind("click", haz_update);
         $("#img_save").css("display","none");
+
 });
 
     // función que registra los cambios en los input para haz_update()
@@ -104,39 +105,40 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
 
 {% block body %}
 
-<table border=0>
-    <tr>
-    {% for filas in columnas: %}
-        <!-- comprueba si es la última vuelta del bucle-->
-        {% if loop.last %}
+<table>
+    <thead>
+        <tr>
+            {% for filas in columnas: %}
+                <!-- comprueba si es la última vuelta del bucle-->
+                {% if loop.last %}
 
-            {% for celdas in filas %}
-                    <th colspan="2">{{ celdas }}</th>
+                    {% for celdas in filas %}
+                            <th colspan="2">{{ celdas }}</th>
+                    {% endfor %}
+
+                {% else %}
+
+                    {% for celdas in filas %}
+                        <th colspan="1">{{ celdas }}</th>
+                    {% endfor %}
+
+                {% endif %}
+
             {% endfor %}
-
-        {% else %}
-
-            {% for celdas in filas %}
-                <th colspan="1">{{ celdas }}</th>
-            {% endfor %}
-
-        {% endif %}
-
-    {% endfor %}
-    </tr>
-
-    {% for fila in registros: %}
-        <tr id="add_controles_{{ loop.index }}">
-            {% for celda in fila %}
-            <td id="td_{{loop.index}}"><input id="campo_{{ loop.index -1 }}" type="text" value="{{ celda }}"></td>
-            {% endfor %}
-        <td id="remove"><img src="../static/images/field_remove.png" width='40'" id="img"></td>
-    </tr>
-    {% endfor %}
-
-    <tr><td colspan="{{ columnas|length +1 }}">
-        <img src="../static/images/separador2.png" class="strech">
-    </td></tr>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fila in registros: %}
+            <tr id="add_controles_{{ loop.index }}">
+                {% for celda in fila %}
+                    <td id="td_{{loop.index}}"><input class="input_auto_width" id="campo_{{ loop.index -1 }}" type="text" value="{{ celda }}"></td>
+                {% endfor %}
+            <td id="remove"><img src="../static/images/field_remove.png" width='40'" id="img"></td>
+        </tr>
+        {% endfor %}
+        <tr><td colspan="{{ columnas|length +1 }}">
+            <img src="../static/images/separador2.png" class="strech"></td>
+        </tr>
 
         <form
             name="form_insercion"
@@ -147,21 +149,20 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
         <input type="hidden" name="tabla" id="tabla" value="{{ params.titulo }}">
         <!-- <input type="hidden" name="pk" value="{{ pk }}"> -->
 
-    <tr>
-
-<!-- forma de acceder a las propiedades de un objeto-->
-{% for i in range(columnas|length): %}
-
-    {% if loop.last %}
-        <td><input type="text" name="campo_{{i}}" id="campo_{{i}}"></td>
-        <td><img id="btn_insert" src="../static/images/field_add.png" width="40"></td>
-    {% else %}
-        <td><input type="text" name="campo_{{i}}" id="campo_{{i}}"></td>
-    {% endif %}
-
-{% endfor %}
-    </tr></table>
-</form>
+        <tr>
+            <!-- forma de acceder a las propiedades de un objeto-->
+            {% for i in range(columnas|length): %}
+                {% if loop.last %}
+                    <td><input class="input_auto_width" type="text" name="campo_{{i}}" id="campo_{{i}}"></td>
+                    <td><img id="btn_insert" src="../static/images/field_add.png" width="40"></td>
+                {% else %}
+                    <td><input class="input_auto_width" type="text" name="campo_{{i}}" id="campo_{{i}}"></td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        </form>
+    </tbody>
+</table>
 
 <center>
 <img src="../static/images/save.png" id="img_save">

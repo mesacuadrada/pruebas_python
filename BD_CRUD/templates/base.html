@@ -3,8 +3,8 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="{{ url_for('static', filename='js/jquery360.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery360.js') }}"></script>
 
     {% block head%}{% endblock %}
 
@@ -16,7 +16,7 @@
 
     <center>
 
-    <table class="general" border=0>
+    <table class="general" border=0     >
     <tr><td width="100">
         {% if 'usuario' in session %}
             <a href="{{ url_for('remove') }}"><img src="../static/images/bd_remove.png" title="Eliminar tabla" width="30"></a>&nbsp;
@@ -46,7 +46,8 @@
                 {% if messages %}
 
                     {% for msg in messages %}
-                    <span class="message">{{ msg }}</span><br><br>
+                        <div class="mensajes">{{ msg }}</div>  
+                        <br><br>
                     {% endfor %}
 
                 {% endif %}
