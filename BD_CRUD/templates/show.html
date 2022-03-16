@@ -34,6 +34,7 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
             }
         );
         lista_valores += "{" + elementos.slice(0, -1) + "},";
+        //console.log(lista_valores);
         $("#img_save").css("display","block");
     }
 
@@ -63,26 +64,6 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
 
     }
 
-        function haz_update(){
-        // quitamos la , añadida por la función registra_cambios()
-        lista_valores = lista_valores.slice(0, -1);
-        lista_valores += "]";
-        //console.log(lista_valores);
-
-        $.ajax({
-            url: '/update_row',
-            type: 'POST',
-            data: {dic: lista_valores, pk:"{{ pk}}", tabla:"{{params.titulo}}"},
-            success: function(response) {
-                $("#img_save").css("display","none");
-            }
-        });
-
-        lista_valores = "["
-
-    }
-
-
 
     // función que lleva los cambios hehos en los campos al python cuando se pulsa
     // la imagen de guardar
@@ -98,6 +79,7 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
             data: {dic: lista_valores, pk:"{{ pk}}", tabla:"{{params.titulo}}"},
             success: function(response) {
                 $("#img_save").css("display","none");
+                location.href = "/show/{{params.titulo}}";
             }
         });
 
@@ -146,7 +128,7 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
     {% for fila in registros: %}
         <tr id="add_controles_{{ loop.index }}">
             {% for celda in fila %}
-            <td id="td_{{loop.index}}"><input id="campo_{{ loop.index -1 }}" type="text" size="5" value="{{ celda }}"></td>
+            <td id="td_{{loop.index}}"><input id="campo_{{ loop.index -1 }}" type="text" value="{{ celda }}"></td>
             {% endfor %}
         <td id="remove"><img src="../static/images/field_remove.png" width='40'" id="img"></td>
     </tr>
@@ -171,10 +153,10 @@ $(document).ready(function(){ // espera que se carge la página para ejecutarse
 {% for i in range(columnas|length): %}
 
     {% if loop.last %}
-        <td><input type="text" size="5" name="campo_{{i}}" id="campo_{{i}}"></td>
+        <td><input type="text" name="campo_{{i}}" id="campo_{{i}}"></td>
         <td><img id="btn_insert" src="../static/images/field_add.png" width="40"></td>
     {% else %}
-        <td><input type="text" size="5" name="campo_{{i}}" id="campo_{{i}}"></td>
+        <td><input type="text" name="campo_{{i}}" id="campo_{{i}}"></td>
     {% endif %}
 
 {% endfor %}

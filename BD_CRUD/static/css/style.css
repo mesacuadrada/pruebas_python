@@ -52,6 +52,7 @@ input, select {
 	padding: 10px;
 	margin: 5px;
 	caret-color: goldenrod;
+	width: 80%;
 }
 
 .general{
